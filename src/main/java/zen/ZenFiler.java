@@ -9,34 +9,63 @@
  */
 package zen;
 
+import java.nio.file.Path;
+import java.util.function.BiPredicate;
+
 import javafx.application.Application;
-import javafx.scene.Group;
+import javafx.collections.ObservableList;
 import javafx.scene.Scene;
-import javafx.scene.web.WebEngine;
-import javafx.scene.web.WebView;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
+import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
+
+import kiss.I;
 
 /**
  * @version 2016/04/02 16:41:36
  */
 public class ZenFiler extends Application {
 
+    private ObservableList<Path> paths = I.make(ObservableList.class);
+
     /**
      * {@inheritDoc}
      */
     @Override
-    public void start(Stage primaryStage) throws Exception {
-        primaryStage.setTitle("Custom Browser");
-        Group root = new Group();
-        Scene scene = new Scene(root, 800, 600);
+    public void start(Stage stage) throws Exception {
+        stage.setTitle("Table View Sample");
 
-        WebView view = new WebView();
-        root.getChildren().add(view);
-        WebEngine engine = view.getEngine();
-        engine.load("http://google.co.jp/");
+        I.walk(I.locate("F:\\"), (BiPredicate) (path, attr) -> {
+            return false;
+        });
 
-        primaryStage.setScene(scene);
-        primaryStage.show();
+        TableColumn nameCol = new TableColumn("ファイル名");
+        TableColumn sizeCol = new TableColumn("サイズ");
+        sizeCol.setMaxWidth(80);
+        sizeCol.setMinWidth(80);
+        TableColumn modifiedCol = new TableColumn("最終更新日");
+        modifiedCol.setMaxWidth(150);
+        modifiedCol.setMinWidth(150);
+
+        TableView table = new TableView();
+        table.setItems(paths);
+        table.setMinWidth(600);
+        table.setMinHeight(900);
+        table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+
+        table.getColumns().addAll(nameCol, sizeCol, modifiedCol);
+
+        // リサイズ可
+        AnchorPane root = new AnchorPane(table);
+        AnchorPane.setBottomAnchor(table, 0d);
+        AnchorPane.setTopAnchor(table, 0d);
+        AnchorPane.setRightAnchor(table, 0d);
+        AnchorPane.setLeftAnchor(table, 0d);
+
+        Scene scene = new Scene(root);
+        stage.setScene(scene);
+        stage.show();
     }
 
     /**
