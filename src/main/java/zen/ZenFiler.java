@@ -10,9 +10,11 @@
 package zen;
 
 import java.nio.file.Path;
+import java.util.List;
 import java.util.function.BiPredicate;
 
 import javafx.application.Application;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.ObservableList;
 import javafx.scene.Scene;
 import javafx.scene.control.TableColumn;
@@ -36,11 +38,19 @@ public class ZenFiler extends Application {
     public void start(Stage stage) throws Exception {
         stage.setTitle("Table View Sample");
 
-        I.walk(I.locate("F:\\"), (BiPredicate) (path, attr) -> {
-            return false;
+        List<Path> walk = I.walk(I.locate("E:\\"), (BiPredicate) (path, attr) -> {
+            return true;
         });
 
-        TableColumn nameCol = new TableColumn("ファイル名");
+        for (Path path : walk) {
+            paths.add(path);
+        }
+
+        TableColumn<Path, String> nameCol = new TableColumn("ファイル名");
+        nameCol.setCellValueFactory(feature -> {
+            return new SimpleStringProperty(feature.getValue().getFileName().toString());
+        });
+
         TableColumn sizeCol = new TableColumn("サイズ");
         sizeCol.setMaxWidth(80);
         sizeCol.setMinWidth(80);
@@ -50,8 +60,8 @@ public class ZenFiler extends Application {
 
         TableView table = new TableView();
         table.setItems(paths);
-        table.setMinWidth(600);
-        table.setMinHeight(900);
+        table.setMinWidth(500);
+        table.setMinHeight(800);
         table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
 
         table.getColumns().addAll(nameCol, sizeCol, modifiedCol);
