@@ -24,8 +24,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import javax.swing.ImageIcon;
 import javax.swing.filechooser.FileSystemView;
 
-import kiss.I;
-
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
@@ -38,6 +36,7 @@ import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.Rectangle;
 
 import bebop.Application;
+import kiss.I;
 
 /**
  * @version 2011/11/17 21:40:06
@@ -271,10 +270,7 @@ public class Resources {
         } else {
             if (view.isFileSystem(path) && !view.isFileSystemRoot(path)) {
                 // normal directory
-                if (directoryIcon == null) {
-                    directoryIcon = getNativeIcon(path);
-                }
-                return directoryIcon;
+                return getNativeIcon(path);
             } else {
                 // root component
                 Image image = paths.get(path);

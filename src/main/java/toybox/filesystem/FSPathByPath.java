@@ -11,17 +11,18 @@ package toybox.filesystem;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.FileVisitOption;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.Collections;
 
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.program.Program;
 
 import bebop.util.Resources;
-import kiss.I;
 
 /**
  * @version 2012/03/07 20:46:25
@@ -88,6 +89,7 @@ public class FSPathByPath extends FSPath {
      */
     @Override
     public Image getIcon() {
+        System.out.println(path);
         return Resources.getIcon(path, attributes.isRegularFile());
     }
 
@@ -118,9 +120,10 @@ public class FSPathByPath extends FSPath {
     @Override
     public void scan(FSScanner scanner) {
         try {
-            Files.walkFileTree(path, new Scanner(scanner));
+            Files.walkFileTree(path, Collections.singleton(FileVisitOption.FOLLOW_LINKS), 1, new Scanner(scanner));
         } catch (Exception e) {
-            throw I.quiet(e);
+            // ignore?
+            System.out.println(e);
         }
     }
 
@@ -151,7 +154,7 @@ public class FSPathByPath extends FSPath {
     /**
      * @version 2012/03/08 2:16:02
      */
-    private static final class Scanner extends SimpleFileVisitor<Path> {
+    private final class Scanner extends SimpleFileVisitor<Path> {
 
         /** The delegator. */
         private final FSScanner scanner;
@@ -168,8 +171,14 @@ public class FSPathByPath extends FSPath {
          */
         @Override
         public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
-            scanner.visitDirectory(new FSPathByPath(dir, attrs));
-            return FileVisitResult.SKIP_SUBTREE;
+            if (path == dir) {
+                // skip root directory
+                return FileVisitResult.CONTINUE;
+            } else {
+                System.out.println(dir);
+                scanner.visitDirectory(new FSPathByPath(dir, attrs));
+                return FileVisitResult.SKIP_SUBTREE;
+            }
         }
 
         /**
@@ -177,8 +186,28 @@ public class FSPathByPath extends FSPath {
          */
         @Override
         public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-            scanner.visitFile(new FSPathByPath(file, attrs));
+            if (attrs.isRegularFile()) {
+                scanner.visitFile(new FSPathByPath(file, attrs));
+            } else {
+                scanner.visitDirectory(new FSPathByPath(file, attrs));
+            }
             return FileVisitResult.CONTINUE;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public FileVisitResult visitFileFailed(Path file, IOException exc) throws IOException {
+            return super.visitFileFailed(file, exc);
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
+            return super.postVisitDirectory(dir, exc);
         }
     }
 }

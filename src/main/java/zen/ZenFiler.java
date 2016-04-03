@@ -9,11 +9,8 @@
  */
 package zen;
 
-import java.nio.file.Path;
-import java.util.List;
-import java.util.function.BiPredicate;
-
 import javafx.application.Application;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.ObservableList;
 import javafx.scene.Scene;
@@ -23,13 +20,15 @@ import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 
 import kiss.I;
+import toybox.filesystem.FSPath;
+import toybox.filesystem.FSScanner;
 
 /**
  * @version 2016/04/02 16:41:36
  */
 public class ZenFiler extends Application {
 
-    private ObservableList<Path> paths = I.make(ObservableList.class);
+    private ObservableList<FSPath> paths = I.make(ObservableList.class);
 
     /**
      * {@inheritDoc}
@@ -38,25 +37,37 @@ public class ZenFiler extends Application {
     public void start(Stage stage) throws Exception {
         stage.setTitle("Table View Sample");
 
-        List<Path> walk = I.walk(I.locate("E:\\"), (BiPredicate) (path, attr) -> {
-            return true;
+        FSPath.locate("F:\\Application").scan(new FSScanner() {
+
+            @Override
+            public void visitFile(FSPath path) {
+                paths.add(path);
+            }
+
+            @Override
+            public void visitDirectory(FSPath path) {
+                paths.add(path);
+            }
         });
 
-        for (Path path : walk) {
-            paths.add(path);
-        }
-
-        TableColumn<Path, String> nameCol = new TableColumn("ファイル名");
+        TableColumn<FSPath, String> nameCol = new TableColumn("ファイル名");
         nameCol.setCellValueFactory(feature -> {
             return new SimpleStringProperty(feature.getValue().getFileName().toString());
         });
 
-        TableColumn sizeCol = new TableColumn("サイズ");
+        TableColumn<FSPath, Long> sizeCol = new TableColumn("サイズ");
         sizeCol.setMaxWidth(80);
         sizeCol.setMinWidth(80);
-        TableColumn modifiedCol = new TableColumn("最終更新日");
-        modifiedCol.setMaxWidth(150);
-        modifiedCol.setMinWidth(150);
+        sizeCol.setCellValueFactory(feature -> {
+            return new SimpleObjectProperty(feature.getValue().attributes.size());
+        });
+
+        TableColumn<FSPath, String> modifiedCol = new TableColumn("最終更新日");
+        modifiedCol.setMaxWidth(160);
+        modifiedCol.setMinWidth(160);
+        modifiedCol.setCellValueFactory(feature -> {
+            return new SimpleStringProperty(feature.getValue().attributes.lastModifiedTime().toString());
+        });
 
         TableView table = new TableView();
         table.setItems(paths);

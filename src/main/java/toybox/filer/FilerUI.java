@@ -48,14 +48,14 @@ import toybox.filesystem.FSPathList;
 import toybox.filesystem.FSScanner;
 
 /**
- * @version 2011/11/17 11:12:28
+ * @version 2016/04/03 16:56:53
  */
 public class FilerUI extends AbstractUI<Filer, Table> {
 
     private static final Random RANDOM = new Random();
 
     /** The date formatter. */
-    private static final SimpleDateFormat format = new SimpleDateFormat("yyyy/MM/dd HH:mm ss");
+    private static final SimpleDateFormat format = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
 
     /** The directory collection. */
     private FSPathList directories = new FSPathList();

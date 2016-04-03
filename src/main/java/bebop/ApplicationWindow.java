@@ -9,12 +9,6 @@
  */
 package bebop;
 
-import kiss.Extensible;
-import kiss.I;
-import kiss.Manageable;
-import kiss.Preference;
-import kiss.model.ClassUtil;
-
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.ControlListener;
@@ -27,6 +21,11 @@ import bebop.input.Key;
 import bebop.ui.AbstractUI;
 import bebop.ui.UIEvent;
 import bebop.util.Resources;
+import kiss.Extensible;
+import kiss.I;
+import kiss.Manageable;
+import kiss.Preference;
+import kiss.model.ClassUtil;
 
 /**
  * @version 2012/03/02 14:41:48
@@ -110,15 +109,17 @@ public class ApplicationWindow<RootModel> implements Extensible {
     private class WindowLocationChaser implements ControlListener {
 
         /**
-         * @see org.eclipse.swt.events.ControlListener#controlMoved(org.eclipse.swt.events.ControlEvent)
+         * {@inheritDoc}
          */
+        @Override
         public void controlMoved(ControlEvent e) {
             bounds = ((Shell) e.widget).getBounds();
         }
 
         /**
-         * @see org.eclipse.swt.events.ControlListener#controlResized(org.eclipse.swt.events.ControlEvent)
+         * {@inheritDoc}
          */
+        @Override
         public void controlResized(ControlEvent e) {
             bounds = ((Shell) e.widget).getBounds();
         }
