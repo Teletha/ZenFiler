@@ -11,9 +11,6 @@ package bebop.ui;
 
 import java.nio.file.Path;
 
-import kiss.Extensible;
-import kiss.model.ClassUtil;
-
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseWheelListener;
@@ -22,9 +19,13 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Table;
+import org.eclipse.swt.widgets.Widget;
 
 import bebop.input.Key;
 import bebop.util.Resources;
+import kiss.Events;
+import kiss.Extensible;
+import kiss.model.ClassUtil;
 
 /**
  * @version 2012/03/02 10:07:36
@@ -96,6 +97,41 @@ public abstract class AbstractUI<M, W extends Composite> implements Extensible {
         if (ui != null) {
             painter.handleEvent(null);
         }
+    }
+
+    /**
+     * <p>
+     * Create click {@link Events}.
+     * </p>
+     * 
+     * @param widget
+     * @return
+     */
+    protected final <A extends Widget> Events<A> click(A widget) {
+        return listen(SWT.Selection, widget);
+    }
+
+    /**
+     * <p>
+     * Create UI {@link Events}.
+     * </p>
+     * 
+     * @param type
+     * @param widget
+     * @return
+     */
+    private <A extends Widget> Events<A> listen(int type, A widget) {
+        return new Events<>(observer -> {
+            Listener listener = e -> {
+                observer.accept((A) e.widget);
+            };
+
+            widget.addListener(type, listener);
+
+            return () -> {
+                widget.removeListener(type, listener);
+            };
+        });
     }
 
     /**

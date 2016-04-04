@@ -38,7 +38,7 @@ public abstract class FilePath implements Comparable<FilePath> {
     public static final FilePath Root = new Root();
 
     /** The zero time. */
-    protected static final FileTime TimeZero = FileTime.fromMillis(0);
+    private static final FileTime TimeZero = FileTime.fromMillis(0);
 
     /** The basic attribute. */
     private static final BasicFileAttributes attributeForDirectory = new BaseAttributes(true);
@@ -359,7 +359,6 @@ public abstract class FilePath implements Comparable<FilePath> {
          */
         @Override
         public Image getIcon() {
-            System.out.println(path);
             return Resources.getIcon(path, attributes.isRegularFile());
         }
 

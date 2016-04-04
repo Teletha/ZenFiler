@@ -128,7 +128,11 @@ public abstract class Selectable<T> implements Iterable<T> {
         if (item == null) {
             deselect();
         } else {
-            setSelectionIndex(add(item));
+            int index = indexOf(item);
+
+            if (index != -1) {
+                setSelectionIndex(index);
+            }
         }
     }
 

@@ -16,6 +16,7 @@ import java.nio.file.Path;
 import java.nio.file.StandardWatchEventKinds;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.List;
@@ -24,10 +25,12 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.FontDialog;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
@@ -41,11 +44,12 @@ import bebop.input.Key;
 import bebop.input.KeyBind;
 import bebop.ui.AbstractUI;
 import bebop.ui.UIEvent;
+import bebop.util.Resources;
 import kiss.Disposable;
 import kiss.I;
+import toybox.filesystem.FSScanner;
 import toybox.filesystem.FilePath;
 import toybox.filesystem.FilePathList;
-import toybox.filesystem.FSScanner;
 
 /**
  * @version 2016/04/03 16:56:53
@@ -63,9 +67,6 @@ public class FilerUI extends AbstractUI<Filer, Table> {
     /** The file collection. */
     private FilePathList files = new FilePathList();
 
-    /** The table drawing state. */
-    private boolean drawable = false;
-
     /** The observer. */
     private Disposable observer;
 
@@ -75,20 +76,45 @@ public class FilerUI extends AbstractUI<Filer, Table> {
     @Override
     protected Table createUI(Composite parent) {
         ui = new Table(parent, SWT.MULTI | SWT.FULL_SELECTION | SWT.VIRTUAL);
+        ui.setFont(Resources.getFont("Noto Sans Japanese Light", 8));
         ui.setHeaderVisible(true);
 
         TableColumn name = new TableColumn(ui, SWT.LEFT);
         name.setText("Name");
-        TableColumn size = new TableColumn(ui, SWT.LEFT);
+        TableColumn size = new TableColumn(ui, SWT.RIGHT);
         size.setText("Size");
         TableColumn date = new TableColumn(ui, SWT.LEFT);
         date.setText("Modified");
 
         move(model.getContext());
 
-        setBackground(I.locate("E:\\神縦\\" + RANDOM.nextInt(27) + ".jpg"), 50);
+        click(name).merge(click(size), click(date)).to(this::sort);
+
+        setBackground(I.locate("E:\\神縦\\" + RANDOM.nextInt(27) + ".jpg"), 30);
 
         return ui;
+    }
+
+    /**
+     * <p>
+     * Sort column.
+     * </p>
+     */
+    private void sort(TableColumn column) {
+        // change model
+        model.sortColumnIndex = ui.indexOf(column);
+        if (ui.getSortColumn() == column) {
+            model.sortOrder = model.sortOrder.invert();
+        }
+
+        // sort ui model
+        directories.sort(comparator());
+        files.sort(comparator());
+
+        // change ui
+        ui.setSortColumn(column);
+        ui.setSortDirection(model.sortOrder.swtId);
+        ui.clearAll();
     }
 
     /**
@@ -164,18 +190,26 @@ public class FilerUI extends AbstractUI<Filer, Table> {
     @KeyBind(key = Key.D)
     @InUIThread
     public void deleteSelection() {
-        TableItem[] items = ui.getSelection();
+        FontDialog dialog = new FontDialog(ui.getShell());
+        // 初期フォントをセット
+        // ダイアログを開く
+        FontData font = dialog.open();
 
-        if (items.length != 0) {
-
-            for (TableItem item : items) {
-                try {
-                    Files.delete(((FilePath) item.getData()).toPath());
-                } catch (IOException e) {
-                    throw I.quiet(e);
-                }
-            }
+        if (font != null) {
+            // ラベルに新しいフォントを設定
+            System.out.println(font.getName() + "  " + font.getStyle() + "  ");
         }
+        // TableItem[] items = ui.getSelection();
+        //
+        // if (items.length != 0) {
+        // for (TableItem item : items) {
+        // try {
+        // Files.delete(((FilePath) item.getData()).toPath());
+        // } catch (IOException e) {
+        // throw I.quiet(e);
+        // }
+        // }
+        // }
     }
 
     /**
@@ -349,8 +383,9 @@ public class FilerUI extends AbstractUI<Filer, Table> {
 
         // start scanning
         DirectoryScanner scanner = new DirectoryScanner();
-
         path.scan(scanner);
+        scanner.files.sort(comparator());
+        scanner.directories.sort(comparator());
 
         // notify remaining resources
         updateTableItems(scanner.directories, scanner.files);
@@ -407,33 +442,7 @@ public class FilerUI extends AbstractUI<Filer, Table> {
     protected void updateTableItems(List<FilePath> directories, List<FilePath> files) {
         this.directories.insert(directories);
         this.files.insert(files);
-
-        if (drawable) ui.setItemCount(this.directories.size() + this.files.size());
-    }
-
-    /**
-     * <p>
-     * Start table drawing.
-     * </p>
-     * 
-     * @param event
-     */
-    @Listen(UIEvent.Activate)
-    protected void enableTableDrawing(Event event) {
-        drawable = true;
         ui.setItemCount(this.directories.size() + this.files.size());
-    }
-
-    /**
-     * <p>
-     * Stop table drawing.
-     * </p>
-     * 
-     * @param event
-     */
-    @Listen(UIEvent.Deactivate)
-    protected void unenableTableDrawing(Event event) {
-        drawable = false;
     }
 
     /**
@@ -514,8 +523,8 @@ public class FilerUI extends AbstractUI<Filer, Table> {
 
         Rectangle area = ui.getClientArea();
         int bar = ui.getItemCount() <= area.height / ui.getItemHeight() ? ui.getVerticalBar().getSize().x : 0;
-        int size = canvas.textExtent("xxxx.xxMB".toUpperCase()).x + 2;
-        int modified = canvas.textExtent("xxxx/xx/xx xx:xx xx".toUpperCase()).x + bar;
+        int size = canvas.textExtent("MMM.MMMB").x;
+        int modified = canvas.textExtent("MMMM/MM/MM XX:XX XX").x + bar;
 
         ui.getColumn(2).setWidth(modified);
         ui.getColumn(1).setWidth(size);
@@ -615,6 +624,34 @@ public class FilerUI extends AbstractUI<Filer, Table> {
         if (redraw) {
             ui.redraw();
         }
+    }
+
+    /**
+     * <p>
+     * Create {@link Comparator}.
+     * </p>
+     * 
+     * @param name
+     * @param order
+     * @return
+     */
+    private Comparator<FilePath> comparator() {
+        Comparator<FilePath> comparator;
+
+        switch (model.sortColumnIndex) {
+        case 2:
+            comparator = Comparator.comparing(path -> path.attributes.lastModifiedTime());
+            break;
+
+        case 1:
+            comparator = Comparator.comparingLong(path -> path.attributes.size());
+            break;
+
+        default:
+            comparator = Comparator.comparing(FilePath::getName);
+            break;
+        }
+        return model.sortOrder.byAscending(comparator);
     }
 
     /**

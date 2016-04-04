@@ -11,12 +11,19 @@ package toybox.filer;
 
 import java.io.Console;
 
+import bebop.util.Order;
 import toybox.filesystem.FilePath;
 
 /**
  * @version 2011/11/17 11:12:28
  */
 public class Filer {
+
+    /** The sort order. */
+    public Order sortOrder = Order.Ascending;
+
+    /** The sort type. */
+    public int sortColumnIndex;
 
     /** The current context directory. */
     private FilePath context;
@@ -39,5 +46,13 @@ public class Filer {
         if (context != null) {
             this.context = context;
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String toString() {
+        return context.toString();
     }
 }

@@ -20,8 +20,8 @@ import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 
 import kiss.I;
-import toybox.filesystem.FilePath;
 import toybox.filesystem.FSScanner;
+import toybox.filesystem.FilePath;
 
 /**
  * @version 2016/04/02 16:41:36
@@ -37,7 +37,7 @@ public class ZenFiler extends Application {
     public void start(Stage stage) throws Exception {
         stage.setTitle("Table View Sample");
 
-        FilePath.of("F:\\Application").scan(new FSScanner() {
+        FilePath.of("E:\\").scan(new FSScanner() {
 
             @Override
             public void visitFile(FilePath path) {
