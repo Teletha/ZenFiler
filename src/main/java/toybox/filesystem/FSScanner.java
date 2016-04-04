@@ -14,7 +14,7 @@ package toybox.filesystem;
  */
 public interface FSScanner {
 
-    void visitFile(FSPath path);
+    void visitFile(FilePath path);
 
-    void visitDirectory(FSPath path);
+    void visitDirectory(FilePath path);
 }

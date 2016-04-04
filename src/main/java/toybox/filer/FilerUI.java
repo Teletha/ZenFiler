@@ -43,8 +43,8 @@ import bebop.ui.AbstractUI;
 import bebop.ui.UIEvent;
 import kiss.Disposable;
 import kiss.I;
-import toybox.filesystem.FSPath;
-import toybox.filesystem.FSPathList;
+import toybox.filesystem.FilePath;
+import toybox.filesystem.FilePathList;
 import toybox.filesystem.FSScanner;
 
 /**
@@ -58,10 +58,10 @@ public class FilerUI extends AbstractUI<Filer, Table> {
     private static final SimpleDateFormat format = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
 
     /** The directory collection. */
-    private FSPathList directories = new FSPathList();
+    private FilePathList directories = new FilePathList();
 
     /** The file collection. */
-    private FSPathList files = new FSPathList();
+    private FilePathList files = new FilePathList();
 
     /** The table drawing state. */
     private boolean drawable = false;
@@ -102,7 +102,7 @@ public class FilerUI extends AbstractUI<Filer, Table> {
         TableItem[] items = ui.getSelection();
 
         if (items.length != 0) {
-            FSPath path = (FSPath) items[0].getData();
+            FilePath path = (FilePath) items[0].getData();
 
             if (path.attributes.isDirectory()) {
                 move(path);
@@ -114,21 +114,32 @@ public class FilerUI extends AbstractUI<Filer, Table> {
 
     /**
      * <p>
-     * Move to the parent directory of th current path.
+     * Move to the parent directory of the current path.
      * </p>
      */
     @KeyBind(key = Key.A)
     @InWorkerThread
     public void moveToUpperDirectory() {
-        FSPath current = model.getContext();
+        FilePath current = model.getContext();
 
         if (current != null) {
-            FSPath parent = current.getParent();
+            FilePath parent = current.getParent();
 
             if (parent != current) {
                 moveAndSelect(parent, current);
             }
         }
+    }
+
+    /**
+     * <p>
+     * Move to the registered directory.
+     * </p>
+     */
+    @KeyBind(key = Key.N1)
+    @InWorkerThread
+    public void moveToRegister1() {
+        moveAndSelect(FilePath.of("E:\\"), model.getContext());
     }
 
     /**
@@ -159,7 +170,7 @@ public class FilerUI extends AbstractUI<Filer, Table> {
 
             for (TableItem item : items) {
                 try {
-                    Files.delete(((FSPath) item.getData()).toPath());
+                    Files.delete(((FilePath) item.getData()).toPath());
                 } catch (IOException e) {
                     throw I.quiet(e);
                 }
@@ -189,7 +200,7 @@ public class FilerUI extends AbstractUI<Filer, Table> {
         TableItem[] items = ui.getSelection();
 
         if (items.length == 1) {
-            FSPath path = (FSPath) items[0].getData();
+            FilePath path = (FilePath) items[0].getData();
 
             if (path.isDirectory) {
                 System.out.println("dire");
@@ -226,7 +237,7 @@ public class FilerUI extends AbstractUI<Filer, Table> {
         TableItem[] items = ui.getSelection();
 
         if (items.length == 1) {
-            FSPath path = (FSPath) items[0].getData();
+            FilePath path = (FilePath) items[0].getData();
 
             if (path.isDirectory) {
                 System.out.println("dire");
@@ -278,7 +289,7 @@ public class FilerUI extends AbstractUI<Filer, Table> {
      * @param path
      */
     @InUIThread
-    public void select(FSPath path) {
+    public void select(FilePath path) {
         int size = directories.size();
 
         for (int i = 0; i < size; i++) {
@@ -317,7 +328,7 @@ public class FilerUI extends AbstractUI<Filer, Table> {
      * 
      * @param path
      */
-    public void move(FSPath path) {
+    public void move(FilePath path) {
         moveAndSelect(path, null);
     }
 
@@ -329,7 +340,7 @@ public class FilerUI extends AbstractUI<Filer, Table> {
      * @param path
      */
     @InWorkerThread(execute = In.Single)
-    public void moveAndSelect(FSPath path, FSPath selection) {
+    public void moveAndSelect(FilePath path, FilePath selection) {
         // change context path
         model.setContext(path);
 
@@ -393,7 +404,7 @@ public class FilerUI extends AbstractUI<Filer, Table> {
      * @param files
      */
     @InUIThread
-    protected void updateTableItems(List<FSPath> directories, List<FSPath> files) {
+    protected void updateTableItems(List<FilePath> directories, List<FilePath> files) {
         this.directories.insert(directories);
         this.files.insert(files);
 
@@ -440,7 +451,7 @@ public class FilerUI extends AbstractUI<Filer, Table> {
         int size = directories.size();
 
         if (i < size) {
-            FSPath file = directories.get(i);
+            FilePath file = directories.get(i);
 
             item.setText(0, file.getName());
 
@@ -450,7 +461,7 @@ public class FilerUI extends AbstractUI<Filer, Table> {
             item.setImage(file.getIcon());
             item.setData(file);
         } else {
-            FSPath file = files.get(i - size);
+            FilePath file = files.get(i - size);
 
             item.setText(0, file.getName());
             item.setText(1, formatSize(file.attributes.size()));
@@ -503,7 +514,7 @@ public class FilerUI extends AbstractUI<Filer, Table> {
 
         Rectangle area = ui.getClientArea();
         int bar = ui.getItemCount() <= area.height / ui.getItemHeight() ? ui.getVerticalBar().getSize().x : 0;
-        int size = canvas.textExtent("xxxx.xxMB".toUpperCase()).x;
+        int size = canvas.textExtent("xxxx.xxMB".toUpperCase()).x + 2;
         int modified = canvas.textExtent("xxxx/xx/xx xx:xx xx".toUpperCase()).x + bar;
 
         ui.getColumn(2).setWidth(modified);
@@ -515,7 +526,7 @@ public class FilerUI extends AbstractUI<Filer, Table> {
 
     @InUIThread
     protected void create(Path nativePath) {
-        FSPath path = FSPath.locate(nativePath);
+        FilePath path = FilePath.of(nativePath);
 
         if (path.isDirectory) {
             // update model
@@ -534,7 +545,7 @@ public class FilerUI extends AbstractUI<Filer, Table> {
 
     @InUIThread
     protected void delete(Path nativePath) {
-        FSPath path = FSPath.locate(nativePath);
+        FilePath path = FilePath.of(nativePath);
 
         // update model
         int index = directories.delete(path);
@@ -559,7 +570,7 @@ public class FilerUI extends AbstractUI<Filer, Table> {
 
     @InUIThread
     protected void modify(Path nativePath) {
-        FSPath path = FSPath.locate(nativePath);
+        FilePath path = FilePath.of(nativePath);
 
         if (path.isDirectory) {
             // update model
@@ -585,7 +596,7 @@ public class FilerUI extends AbstractUI<Filer, Table> {
      * @param index
      * @param create
      */
-    private void update(FSPath path, TableItem item, boolean redraw) {
+    private void update(FilePath path, TableItem item, boolean redraw) {
         if (path.isDirectory) {
             long last = path.attributes.lastModifiedTime().toMillis();
 
@@ -618,16 +629,16 @@ public class FilerUI extends AbstractUI<Filer, Table> {
         private int counter = 0;
 
         /** The directory collection. */
-        private List<FSPath> directories = new ArrayList();
+        private List<FilePath> directories = new ArrayList();
 
         /** The file collection. */
-        private List<FSPath> files = new ArrayList();
+        private List<FilePath> files = new ArrayList();
 
         /**
          * {@inheritDoc}
          */
         @Override
-        public void visitFile(FSPath path) {
+        public void visitFile(FilePath path) {
             files.add(path);
 
             if (limit < ++counter) {
@@ -647,7 +658,7 @@ public class FilerUI extends AbstractUI<Filer, Table> {
          * {@inheritDoc}
          */
         @Override
-        public void visitDirectory(FSPath path) {
+        public void visitDirectory(FilePath path) {
             directories.add(path);
 
             if (limit < ++counter) {

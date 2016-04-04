@@ -20,7 +20,7 @@ import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 
 import kiss.I;
-import toybox.filesystem.FSPath;
+import toybox.filesystem.FilePath;
 import toybox.filesystem.FSScanner;
 
 /**
@@ -28,7 +28,7 @@ import toybox.filesystem.FSScanner;
  */
 public class ZenFiler extends Application {
 
-    private ObservableList<FSPath> paths = I.make(ObservableList.class);
+    private ObservableList<FilePath> paths = I.make(ObservableList.class);
 
     /**
      * {@inheritDoc}
@@ -37,32 +37,32 @@ public class ZenFiler extends Application {
     public void start(Stage stage) throws Exception {
         stage.setTitle("Table View Sample");
 
-        FSPath.locate("F:\\Application").scan(new FSScanner() {
+        FilePath.of("F:\\Application").scan(new FSScanner() {
 
             @Override
-            public void visitFile(FSPath path) {
+            public void visitFile(FilePath path) {
                 paths.add(path);
             }
 
             @Override
-            public void visitDirectory(FSPath path) {
+            public void visitDirectory(FilePath path) {
                 paths.add(path);
             }
         });
 
-        TableColumn<FSPath, String> nameCol = new TableColumn("ファイル名");
+        TableColumn<FilePath, String> nameCol = new TableColumn("ファイル名");
         nameCol.setCellValueFactory(feature -> {
             return new SimpleStringProperty(feature.getValue().getFileName().toString());
         });
 
-        TableColumn<FSPath, Long> sizeCol = new TableColumn("サイズ");
+        TableColumn<FilePath, Long> sizeCol = new TableColumn("サイズ");
         sizeCol.setMaxWidth(80);
         sizeCol.setMinWidth(80);
         sizeCol.setCellValueFactory(feature -> {
             return new SimpleObjectProperty(feature.getValue().attributes.size());
         });
 
-        TableColumn<FSPath, String> modifiedCol = new TableColumn("最終更新日");
+        TableColumn<FilePath, String> modifiedCol = new TableColumn("最終更新日");
         modifiedCol.setMaxWidth(160);
         modifiedCol.setMinWidth(160);
         modifiedCol.setCellValueFactory(feature -> {

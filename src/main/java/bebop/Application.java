@@ -30,7 +30,7 @@ import org.eclipse.swt.events.ShellEvent;
 import org.eclipse.swt.events.ShellListener;
 import org.eclipse.swt.widgets.Display;
 
-import toybox.filesystem.FSPath;
+import toybox.filesystem.FilePath;
 
 /**
  * <p>
@@ -62,7 +62,7 @@ public abstract class Application {
     public static final Display display = Display.getDefault();
 
     /** The application context directory. */
-    public final FSPath contextDirectory;
+    public final FilePath contextDirectory;
 
     /** The configuration. */
     protected Class<? extends ApplicationWindow> initialApplicationWindow;
@@ -79,7 +79,7 @@ public abstract class Application {
      * </p>
      */
     protected Application() {
-        contextDirectory = FSPath.locate(I.locate("").toAbsolutePath());
+        contextDirectory = FilePath.of(I.locate("").toAbsolutePath());
     }
 
     /**

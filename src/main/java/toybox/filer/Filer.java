@@ -11,7 +11,7 @@ package toybox.filer;
 
 import java.io.Console;
 
-import toybox.filesystem.FSPath;
+import toybox.filesystem.FilePath;
 
 /**
  * @version 2011/11/17 11:12:28
@@ -19,14 +19,14 @@ import toybox.filesystem.FSPath;
 public class Filer {
 
     /** The current context directory. */
-    private FSPath context;
+    private FilePath context;
 
     /**
      * Get the context property of this {@link Console}.
      * 
      * @return The context property.
      */
-    public FSPath getContext() {
+    public FilePath getContext() {
         return context;
     }
 
@@ -35,7 +35,7 @@ public class Filer {
      * 
      * @param context The context value to set.
      */
-    public void setContext(FSPath context) {
+    public void setContext(FilePath context) {
         if (context != null) {
             this.context = context;
         }
