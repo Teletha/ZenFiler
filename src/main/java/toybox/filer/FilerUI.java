@@ -76,7 +76,7 @@ public class FilerUI extends AbstractUI<Filer, Table> {
     @Override
     protected Table createUI(Composite parent) {
         ui = new Table(parent, SWT.MULTI | SWT.FULL_SELECTION | SWT.VIRTUAL);
-        ui.setFont(Resources.getFont("Noto Sans Japanese Light", 8));
+        ui.setFont(Resources.getFont("MeiryoKe_UIGothic", 9));
         ui.setHeaderVisible(true);
 
         TableColumn name = new TableColumn(ui, SWT.LEFT);
