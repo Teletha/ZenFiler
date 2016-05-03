@@ -18,9 +18,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
 
-import kiss.Table;
-import kiss.model.ClassUtil;
-
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.custom.VerifyKeyListener;
@@ -33,6 +30,7 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 
 import bebop.util.SWTUtil;
+import kiss.Table;
 
 /**
  * @version 2011/11/02 15:52:39
@@ -330,7 +328,7 @@ public enum Key {
         }
 
         // Collect key binding methods.
-        Table<Method, Annotation> methods = ClassUtil.getAnnotations(keies.getClass());
+        Table<Method, Annotation> methods = kiss.I.collectAnnotationsOf(keies.getClass());
 
         for (Entry<Method, List<Annotation>> entry : methods.entrySet()) {
             Method method = entry.getKey();
@@ -348,8 +346,7 @@ public enum Key {
      * @version 2012/03/03 21:07:59
      */
     @SuppressWarnings("serial")
-    private static class KeyBindings extends HashMap<KeyStroke, KeyBinding>
-            implements Listener, TraverseListener, VerifyKeyListener {
+    private static class KeyBindings extends HashMap<KeyStroke, KeyBinding> implements Listener, TraverseListener, VerifyKeyListener {
 
         /** The associated widget. */
         private final Control control;

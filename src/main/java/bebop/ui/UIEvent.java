@@ -14,10 +14,6 @@ import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Map.Entry;
 
-import kiss.I;
-import kiss.Table;
-import kiss.model.ClassUtil;
-
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.custom.CTabFolder2Listener;
@@ -29,6 +25,8 @@ import org.eclipse.swt.widgets.Widget;
 import bebop.Listen;
 import bebop.model.Selectable;
 import bebop.model.SelectableListener;
+import kiss.I;
+import kiss.Table;
 
 /**
  * @version 2012/03/01 22:50:35
@@ -130,7 +128,7 @@ public enum UIEvent {
      * @param widget A event subscriber.
      */
     public static void listen(Widget publisher, Object subscriber) {
-        Table<Method, Annotation> table = ClassUtil.getAnnotations(subscriber.getClass());
+        Table<Method, Annotation> table = I.collectAnnotationsOf(subscriber.getClass());
 
         for (Entry<Method, List<Annotation>> entry : table.entrySet()) {
             Method method = entry.getKey();
@@ -168,7 +166,7 @@ public enum UIEvent {
      * @param widget A event subscriber.
      */
     public static void listen(Selectable publisher, Object subscriber) {
-        Table<Method, Annotation> table = ClassUtil.getAnnotations(subscriber.getClass());
+        Table<Method, Annotation> table = I.collectAnnotationsOf(subscriber.getClass());
 
         for (Entry<Method, List<Annotation>> entry : table.entrySet()) {
             Method method = entry.getKey();
