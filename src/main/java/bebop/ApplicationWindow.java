@@ -9,6 +9,8 @@
  */
 package bebop;
 
+import java.lang.reflect.Type;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.ControlListener;
@@ -55,8 +57,8 @@ public class ApplicationWindow<RootModel> implements Extensible {
      * 
      */
     protected ApplicationWindow() {
-        Class[] types = ClassUtil.getParameter(getClass(), ApplicationWindow.class);
-        modelType = types[0];
+        Type[] types = ClassUtil.getParameter(getClass(), ApplicationWindow.class);
+        modelType = (Class) types[0];
 
         model = I.make((Class<RootModel>) modelType);
         shell = createWindow(Application.display);

@@ -142,9 +142,9 @@ public abstract class Form<C extends Control> implements Comparable<Form> {
      */
     public static final void build(Composite ui, Object instance) {
         List<Form> forms = new ArrayList();
-        Model model = Model.of(instance.getClass());
+        Model<Object> model = Model.of(instance);
 
-        for (Property property : model.properties) {
+        for (Property property : model.properties()) {
             Inputable inputable = property.getAnnotation(Inputable.class);
 
             if (inputable != null) {

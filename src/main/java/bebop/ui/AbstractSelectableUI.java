@@ -9,19 +9,18 @@
  */
 package bebop.ui;
 
-import kiss.I;
-import kiss.model.ClassUtil;
-
 import org.eclipse.swt.widgets.Composite;
 
 import bebop.model.Selectable;
 import bebop.model.SelectableListener;
+import kiss.I;
+import kiss.model.ClassUtil;
 
 /**
  * @version 2012/03/02 10:42:23
  */
-public abstract class AbstractSelectableUI<Model extends Selectable<SubModel>, SubModel, W extends Composite>
-        extends AbstractUI<Model, W> implements SelectableListener<SubModel> {
+public abstract class AbstractSelectableUI<Model extends Selectable<SubModel>, SubModel, W extends Composite> extends AbstractUI<Model, W>
+        implements SelectableListener<SubModel> {
 
     /** The type of child model. */
     protected Class<SubModel> subModelType;
@@ -33,7 +32,7 @@ public abstract class AbstractSelectableUI<Model extends Selectable<SubModel>, S
     public void initialize(Composite parent, Model model) {
         super.initialize(parent, model);
 
-        subModelType = ClassUtil.getParameter(model.getClass(), Selectable.class)[0];
+        subModelType = (Class) ClassUtil.getParameter(model.getClass(), Selectable.class)[0];
 
         model.listen(this);
     }

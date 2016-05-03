@@ -88,7 +88,7 @@ public class Binds extends Interceptor<Bind> {
                     Model model = Model.of(param.getClass());
 
                     // exclude GUI Widget
-                    if (model.properties.size() != 0 && !(param instanceof Widget)) {
+                    if (model.properties().size() != 0 && !(param instanceof Widget)) {
                         // register as model state listener
                         Table<String, Binds> binds = contexts.get(param);
 

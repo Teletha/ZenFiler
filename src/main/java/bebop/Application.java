@@ -21,15 +21,13 @@ import java.nio.file.StandardWatchEventKinds;
 import java.nio.file.attribute.FileTime;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import kiss.I;
-import kiss.Manageable;
-import kiss.Preference;
-import kiss.model.ClassUtil;
-
 import org.eclipse.swt.events.ShellEvent;
 import org.eclipse.swt.events.ShellListener;
 import org.eclipse.swt.widgets.Display;
 
+import kiss.I;
+import kiss.Manageable;
+import kiss.Preference;
 import toybox.filesystem.FilePath;
 
 /**
@@ -44,7 +42,7 @@ public abstract class Application {
 
     // initialization
     static {
-        I.load(ClassUtil.getArchive(Application.class));
+        I.load(I.locate(Application.class));
 
         Thread.setDefaultUncaughtExceptionHandler(new UncaughtExceptionHandler() {
 
@@ -183,7 +181,7 @@ public abstract class Application {
             new Activator(applicationClass, policy, params);
         } catch (Throwable e) {
             // handle appication error
-            Path path = ClassUtil.getArchive(applicationClass);
+            Path path = I.locate(applicationClass);
 
             if (Files.isDirectory(path)) {
                 e.printStackTrace(System.out);
@@ -289,12 +287,11 @@ public abstract class Application {
                     }
 
                     // observe lock directory for next application
-                    I.observe(root)
-                            .to(e -> {
-                                if (e.kind() == StandardWatchEventKinds.ENTRY_CREATE || e.kind() == StandardWatchEventKinds.ENTRY_MODIFY) {
-                                    notify(e.context());
-                                }
-                            });
+                    I.observe(root).to(e -> {
+                        if (e.kind() == StandardWatchEventKinds.ENTRY_CREATE || e.kind() == StandardWatchEventKinds.ENTRY_MODIFY) {
+                            notify(e.context());
+                        }
+                    });
                 } catch (Exception e) {
                     throw I.quiet(e);
                 }
@@ -304,7 +301,7 @@ public abstract class Application {
             // Launching Phase
             // =====================================================================
             // load application library
-            I.load(ClassUtil.getArchive(applicationClass));
+            I.load(I.locate(applicationClass));
 
             // setup application
             application = I.make(applicationClass);
