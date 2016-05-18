@@ -328,7 +328,7 @@ public enum Key {
         }
 
         // Collect key binding methods.
-        Table<Method, Annotation> methods = kiss.I.collectAnnotationsOf(keies.getClass());
+        Table<Method, Annotation> methods = kiss.I.collectAnnotatedMethods(keies.getClass());
 
         for (Entry<Method, List<Annotation>> entry : methods.entrySet()) {
             Method method = entry.getKey();

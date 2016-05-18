@@ -128,7 +128,7 @@ public enum UIEvent {
      * @param widget A event subscriber.
      */
     public static void listen(Widget publisher, Object subscriber) {
-        Table<Method, Annotation> table = I.collectAnnotationsOf(subscriber.getClass());
+        Table<Method, Annotation> table = I.collectAnnotatedMethods(subscriber.getClass());
 
         for (Entry<Method, List<Annotation>> entry : table.entrySet()) {
             Method method = entry.getKey();
@@ -166,7 +166,7 @@ public enum UIEvent {
      * @param widget A event subscriber.
      */
     public static void listen(Selectable publisher, Object subscriber) {
-        Table<Method, Annotation> table = I.collectAnnotationsOf(subscriber.getClass());
+        Table<Method, Annotation> table = I.collectAnnotatedMethods(subscriber.getClass());
 
         for (Entry<Method, List<Annotation>> entry : table.entrySet()) {
             Method method = entry.getKey();

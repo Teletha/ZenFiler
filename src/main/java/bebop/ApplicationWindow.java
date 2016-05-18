@@ -27,7 +27,6 @@ import kiss.Extensible;
 import kiss.I;
 import kiss.Manageable;
 import kiss.Preference;
-import kiss.model.ClassUtil;
 
 /**
  * @version 2012/03/02 14:41:48
@@ -57,7 +56,7 @@ public class ApplicationWindow<RootModel> implements Extensible {
      * 
      */
     protected ApplicationWindow() {
-        Type[] types = ClassUtil.getParameter(getClass(), ApplicationWindow.class);
+        Type[] types = I.collectParameters(getClass(), ApplicationWindow.class);
         modelType = (Class) types[0];
 
         model = I.make((Class<RootModel>) modelType);
