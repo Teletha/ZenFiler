@@ -25,7 +25,7 @@ import bebop.input.Key;
 import bebop.util.Resources;
 import kiss.Events;
 import kiss.Extensible;
-import kiss.I;
+import kiss.model.Model;
 
 /**
  * @version 2012/03/02 10:07:36
@@ -39,7 +39,7 @@ public abstract class AbstractUI<M, W extends Composite> implements Extensible {
     protected M model;
 
     /** The type of model object. */
-    protected final Class modelType = (Class) I.collectParameters(getClass(), AbstractUI.class)[0];
+    protected final Class modelType = (Class) Model.collectParameters(getClass(), AbstractUI.class)[0];
 
     /** The background image painter. */
     private BackgroundImagePainter painter = new BackgroundImagePainter();

@@ -31,7 +31,7 @@ public abstract class AbstractSelectableUI<Model extends Selectable<SubModel>, S
     public void initialize(Composite parent, Model model) {
         super.initialize(parent, model);
 
-        subModelType = (Class) I.collectParameters(model.getClass(), Selectable.class)[0];
+        subModelType = (Class) kiss.model.Model.collectParameters(model.getClass(), Selectable.class)[0];
 
         model.listen(this);
     }

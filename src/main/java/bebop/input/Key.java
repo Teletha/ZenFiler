@@ -31,6 +31,7 @@ import org.eclipse.swt.widgets.Listener;
 
 import bebop.util.SWTUtil;
 import kiss.Table;
+import kiss.model.Model;
 
 /**
  * @version 2011/11/02 15:52:39
@@ -328,7 +329,7 @@ public enum Key {
         }
 
         // Collect key binding methods.
-        Table<Method, Annotation> methods = kiss.I.collectAnnotatedMethods(keies.getClass());
+        Table<Method, Annotation> methods = Model.collectAnnotatedMethods(keies.getClass());
 
         for (Entry<Method, List<Annotation>> entry : methods.entrySet()) {
             Method method = entry.getKey();
